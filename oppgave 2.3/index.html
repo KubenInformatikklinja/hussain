@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Primtall-finner</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">Tallteori</p>
+      <h1>Finn primtall <span>nr. T</span></h1>
+      <p class="intro">Skriv inn en posisjon, så beregner vi hvilket primtall som står der.</p>
+
+      <form id="skjema">
+        <label for="T">Primtallnummer T</label>
+        <div class="controls">
+          <input id="T" name="T" type="number" min="1" max="10000000" step="1" value="10000" required />
+          <button type="submit">Finn primtallet</button>
+        </div>
+      </form>
+
+      <section id="resultat" class="resultat" aria-live="polite">
+        <p>Prøv for eksempel <strong>1000000</strong>.</p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

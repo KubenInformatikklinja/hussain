@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Norge & general quiz</title>
+  <style>
+    :root {
+      --navy: #0b1f33;
+      --blue: #dcecff;
+      --red: #ba1b32;
+      --cream: #f7f5ef;
+      --ink: #17212b;
+      --green: #16794a;
+      --green-bg: #e9f7ef;
+      --wrong: #b42332;
+      --wrong-bg: #fff0f1;
+      --border: #d6dbe2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(186,27,50,.09), transparent 28rem),
+        linear-gradient(145deg, #eef5ff 0%, var(--cream) 100%);
+    }
+    .page {
+      width: min(820px, calc(100% - 28px));
+      margin: 24px auto;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--navy);
+    }
+    .flag {
+      width: 48px;
+      height: 34px;
+      border-radius: 5px;
+      background:
+        linear-gradient(90deg, transparent 25%, #fff 25%, #fff 38%, #102f62 38%, #102f62 62%, #fff 62%, #fff 75%, transparent 75%),
+        linear-gradient(transparent 31%, #fff 31%, #fff 44%, #102f62 44%, #102f62 69%, #fff 69%, #fff 82%, transparent 82%),
+        #ba1b32;
+      box-shadow: 0 3px 10px rgba(11,31,51,.12);
+    }
+    h1 { margin: 0; font-size: clamp(1.35rem, 4vw, 2rem); }
+    .timer {
+      flex: none;
+      min-width: 92px;
+      text-align: center;
+      padding: 9px 12px;
+      border: 1px solid #bac8d8;
+      border-radius: 999px;
+      background: white;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 4px 14px rgba(11,31,51,.08);
+    }
+    .timer.urgent { color: var(--wrong); border-color: #efb4bb; background: var(--wrong-bg); }
+    .card {
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(11,31,51,.09);
+      border-radius: 18px;
+      box-shadow: 0 16px 44px rgba(11,31,51,.10);
+      overflow: hidden;
+    }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 18px;
+      background: var(--navy);
+      color: white;
+      font-size: .92rem;
+    }
+    form { padding: 6px 18px 18px; }
+    fieldset {
+      border: 0;
+      border-bottom: 1px solid #edf0f3;
+      margin: 0;
+      padding: 16px 0 14px;
+      min-width: 0;
+    }
+    fieldset:last-of-type { border-bottom: 0; }
+    legend {
+      width: 100%;
+      font-size: 1.05rem;
+      font-weight: 750;
+      line-height: 1.35;
+      padding: 0 0 10px;
+    }
+    .number { color: var(--red); margin-right: 7px; }
+    .alternatives { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      gap: 9px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .option:hover { border-color: #91a8c2; transform: translateY(-1px); }
+    .option:has(input:focus-visible) { outline: 3px solid #77a9e5; outline-offset: 2px; }
+    .option input { width: 18px; height: 18px; accent-color: var(--navy); flex: none; }
+    .option.correct { border: 2px solid var(--green); background: var(--green-bg); color: #0d5534; }
+    .option.incorrect { border: 2px solid var(--wrong); background: var(--wrong-bg); color: #7c1520; }
+    .option.correct::after, .option.incorrect::after {
+      content: "";
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      margin-left: auto;
+    }
+    .option.incorrect::after { width: 12px; height: 12px; border: 0; transform: none; background: linear-gradient(45deg, transparent 44%, currentColor 45%, currentColor 55%, transparent 56%), linear-gradient(-45deg, transparent 44%, currentColor 45%, currentColor 55%, transparent 56%); }
+    fieldset.submitted .option { cursor: default; }
+    fieldset.submitted .option:hover { transform: none; }
+    .actions { display: flex; justify-content: center; padding-top: 14px; }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      background: var(--red);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 7px 18px rgba(186,27,50,.24);
+    }
+    button:hover { background: #981527; }
+    button:focus-visible { outline: 3px solid #77a9e5; outline-offset: 3px; }
+    .result {
+      display: none;
+      margin: 14px 18px 18px;
+      padding: 18px;
+      border-radius: 14px;
+      background: #edf4ff;
+      border: 1px solid #cbdaf0;
+      text-align: center;
+    }
+    .result.show { display: block; }
+    .score { font-size: clamp(2rem, 8vw, 3.2rem); font-weight: 900; color: var(--navy); margin: 4px 0; }
+    .result p { margin: 6px 0 14px; }
+    @media (max-width: 620px) {
+      .page { width: min(100% - 18px, 820px); margin: 10px auto; }
+      .topbar { align-items: flex-start; }
+      .brand { gap: 8px; }
+      .flag { width: 40px; height: 28px; }
+      .status { padding: 11px 12px; }
+      form { padding: 4px 12px 12px; }
+      .alternatives { grid-template-columns: 1fr; }
+      fieldset { padding: 13px 0 12px; }
+      .option { min-height: 46px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .option { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <span class="flag" aria-hidden="true"></span>
+        <h1>Norge & general kunnskap</h1>
+      </div>
+      <div id="timer" class="timer" role="timer" aria-label="Tid igjen">05:00</div>
+    </header>
+
+    <section class="card" aria-label="Quiz">
+      <div class="status">
+        <span id="progress">10 spørsmål</span>
+        <span id="highScore">Rekord: 0 av 10</span>
+      </div>
+      <form id="quizForm" novalidate>
+        <div id="questions"></div>
+        <div class="actions">
+          <button id="submitButton" type="submit">Sjekk svar</button>
+        </div>
+      </form>
+      <div id="result" class="result" aria-live="polite" tabindex="-1">
+        <div class="score" id="scoreText"></div>
+        <p id="message"></p>
+        <button type="button" id="restartButton">Prøv igjen</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const questionPool = [
+      { text: "Hva er hovedstaden i Norge?", alternatives: ["Bergen", "Oslo", "Trondheim", "Stavanger"], answer: "Oslo" },
+      { text: "Hva heter det norske nasjonaldyret?", alternatives: ["Kongeørn", "Elg", "Bjørn", "Rein"], answer: "Elg" },
+      { text: "Hvilket hav ligger vest for Norge?", alternatives: ["Østersjøen", "Nordsjøen", "Svartehavet", "Adriaterhavet"], answer: "Nordsjøen" },
+      { text: "Hvor mange kongeriket Norges fylker hadde det fra 2024 til 2025?", alternatives: ["11", "15", "18", "21"], answer: "15" },
+      { text: "Hvem komponerte 'I Dovregubbens hall'?", alternatives: ["Edvard Grieg", "Edvard Munch", "Henrik Ibsen", "Ole Bull"], answer: "Edvard Grieg" },
+      { text: "Hva er verdens største hav?", alternatives: ["Atlanterhavet", "Indiahavet", "Stillehavet", "Nordishavet"], answer: "Stillehavet" },
+      { text: "Hvilket land har Tokyo som hovedstad?", alternatives: ["Kina", "Japan", "Sør-Korea", "Thailand"], answer: "Japan" },
+      { text: "Hva er den største planeten i solsystemet vårt?", alternatives: ["Saturn", "Jupiter", "Neptun", "Mars"], answer: "Jupiter" },
+      { text: "Hvorfor feirer Norge nasjonaldagen 17. mai?", alternatives: ["Grunnloven ble vedtatt i 1814", "Unionsoppløsningen i 1905", "Freden i 1945", "Første Storting i 1814"], answer: "Grunnloven ble vedtatt i 1814" },
+      { text: "Hva er H2O i vanlig språk?", alternatives: ["Salt", "Vann", "Oksygen", "Hydrogen"], answer: "Vann" },
+      { text: "Hvilken norsk fjord er en del av UNESCOs verdensarv?", alternatives: ["Geirangerfjorden", "Hardangerfjorden", "Trondheimsfjorden", "Oslofjorden"], answer: "Geirangerfjorden" },
+      { text: "Hvem malte Mona Lisa?", alternatives: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Claude Monet"], answer: "Leonardo da Vinci" },
+      { text: "Hva er hovedstaden i Sverige?", alternatives: ["København", "Helsinki", "Stockholm", "Oslo"], answer: "Stockholm" },
+      { text: "Hvor mange sider har en femkant?", alternatives: ["4", "5", "6", "7"], answer: "5" },
+      { text: "Hva er det høyeste fjellet i Norge?", alternatives: ["Galdhøpiggen", "Gaustatoppen", "Snøhetta", "Store Skagastølstind"], answer: "Galdhøpiggen" },
+      { text: "Hvilket grunnstoff har kjemisk symbol Au?", alternatives: ["Sølv", "Gull", "Aluminium", "Argon"], answer: "Gull" },
+      { text: "På hvilket kontinent ligger Egypt?", alternatives: ["Asia", "Europa", "Afrika", "Sør-Amerika"], answer: "Afrika" },
+      { text: "Hva heter den norske valutaen?", alternatives: ["Krone", "Euro", "Kroner", "Norsk dollar"], answer: "Krone" },
+      { text: "Hvor raskt beveger lyset seg i vakuum, omtrent?", alternatives: ["300 000 km/s", "30 000 km/s", "3 000 km/s", "300 km/s"], answer: "300 000 km/s" },
+      { text: "Hvilket språk er det mest brukte morsmålet i verden?", alternatives: ["Engelsk", "Spansk", "Mandarin-kinesisk", "Hindi"], answer: "Mandarin-kinesisk" }
+    ];
+
+    const form = document.getElementById("quizForm");
+    const questionsContainer = document.getElementById("questions");
+    const submitButton = document.getElementById("submitButton");
+    const restartButton = document.getElementById("restartButton");
+    const result = document.getElementById("result");
+    const scoreText = document.getElementById("scoreText");
+    const message = document.getElementById("message");
+    const timerElement = document.getElementById("timer");
+    const highScoreElement = document.getElementById("highScore");
+    let selectedQuestions = [];
+    let secondsLeft = 300;
+    let timerId = null;
+    let submitted = false;
+
+    function randomize(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function getHighScore() {
+      try {
+        const value = Number(localStorage.getItem("norgeQuizHighScore"));
+        return Number.isFinite(value) ? Math.max(0, Math.min(10, value)) : 0;
+      } catch (_) {
+        return 0;
+      }
+    }
+
+    function updateHighScore() {
+      highScoreElement.textContent = "Rekord: " + getHighScore() + " av 10";
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      secondsLeft = 300;
+      timerElement.classList.remove("urgent");
+      updateTimer();
+      timerId = setInterval(() => {
+        secondsLeft--;
+        updateTimer();
+        if (secondsLeft <= 0) {
+          clearInterval(timerId);
+          submitQuiz(true);
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      const minutes = Math.floor(secondsLeft / 60);
+      const seconds = secondsLeft % 60;
+      timerElement.textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+      timerElement.setAttribute("aria-label", "Tid igjen: " + minutes + " minutter og " + seconds + " sekunder");
+      timerElement.classList.toggle("urgent", secondsLeft <= 60);
+    }
+
+    function renderQuiz() {
+      submitted = false;
+      result.classList.remove("show");
+      questionsContainer.innerHTML = "";
+      selectedQuestions = randomize(questionPool).slice(0, 10);
+
+      selectedQuestions.forEach((question, questionIndex) => {
+        const fieldset = document.createElement("fieldset");
+        const legend = document.createElement("legend");
+        const number = document.createElement("span");
+        number.className = "number";
+        number.textContent = (questionIndex + 1) + ".";
+        legend.append(number, document.createTextNode(" " + question.text));
+        fieldset.appendChild(legend);
+
+        const alternatives = document.createElement("div");
+        alternatives.className = "alternatives";
+        randomize(question.alternatives).forEach((alternative, alternativeIndex) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "question-" + questionIndex;
+          radio.value = alternative;
+          radio.id = "q" + questionIndex + "-a" + alternativeIndex;
+          const text = document.createElement("span");
+          text.textContent = alternative;
+          label.append(radio, text);
+          alternatives.appendChild(label);
+        });
+        fieldset.appendChild(alternatives);
+        questionsContainer.appendChild(fieldset);
+      });
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Sjekk svar";
+      updateHighScore();
+      startTimer();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      const firstRadio = questionsContainer.querySelector("input");
+      if (firstRadio) firstRadio.focus();
+    }
+
+    function submitQuiz(timeExpired = false) {
+      if (submitted) return;
+      submitted = true;
+      clearInterval(timerId);
+
+      let score = 0;
+      selectedQuestions.forEach((question, questionIndex) => {
+        const fieldset = questionsContainer.querySelectorAll("fieldset")[questionIndex];
+        fieldset.classList.add("submitted");
+        const selected = form.querySelector('input[name="question-' + questionIndex + '"]:checked');
+
+        fieldset.querySelectorAll(".option").forEach((label) => {
+          const radio = label.querySelector("input");
+          radio.disabled = true;
+          if (radio.value === question.answer) label.classList.add("correct");
+          if (selected && radio === selected && radio.value !== question.answer) label.classList.add("incorrect");
+        });
+        if (selected && selected.value === question.answer) score++;
+      });
+
+      submitButton.disabled = true;
+      scoreText.textContent = score + " av 10";
+      message.textContent = timeExpired
+        ? "Tiden gikk ut. "
+        : "Du har fullført quizen. ";
+
+      if (score === 10) message.textContent += "Perfekt!";
+      else if (score >= 7) message.textContent += "Svært godt resultat!";
+      else if (score >= 4) message.textContent += "Bra forsøk!";
+      else message.textContent += "Prøv igjen!";
+
+      const previousHigh = getHighScore();
+      if (score > previousHigh) {
+        try { localStorage.setItem("norgeQuizHighScore", String(score)); } catch (_) {}
+        message.textContent += " Ny rekord!";
+      }
+      updateHighScore();
+      result.classList.add("show");
+      result.focus();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitQuiz(false);
+    });
+
+    restartButton.addEventListener("click", renderQuiz);
+    renderQuiz();
+  </script>
+</body>
+</html>

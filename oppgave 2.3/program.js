@@ -73,19 +73,27 @@ function finnPrimtallnummer(T) {
   }
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+function kjørTerminal() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-rl.question("Hvilket primtallnummer vil du finne (T)? ", (svar) => {
-  const T = Number(svar.trim());
+  rl.question("Hvilket primtallnummer vil du finne (T)? ", (svar) => {
+    const T = Number(svar.trim());
 
-  if (!Number.isSafeInteger(T) || T < 1 || T > MAX_T) {
-    console.log(`T må være et heltall mellom 1 og ${MAX_T}.`);
-  } else {
-    console.log(`Primtall nr. ${T} er ${finnPrimtallnummer(T)}.`);
-  }
+    if (!Number.isSafeInteger(T) || T < 1 || T > MAX_T) {
+      console.log(`T må være et heltall mellom 1 og ${MAX_T}.`);
+    } else {
+      console.log(`Primtall nr. ${T} er ${finnPrimtallnummer(T)}.`);
+    }
 
-  rl.close();
-});
+    rl.close();
+  });
+}
+
+module.exports = { MAX_T, finnPrimtallnummer };
+
+if (require.main === module) {
+  kjørTerminal();
+}
