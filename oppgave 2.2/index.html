@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partall eller oddetall</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="kort">
+      <span class="etikett">Talltester</span>
+      <h1>Partall eller <span>oddetall?</span></h1>
+      <p class="beskrivelse">Skriv inn et heltall, så sjekker vi hvilket type tall det er.</p>
+
+      <label for="tall">Heltall</label>
+      <div class="inndata">
+        <input id="tall" type="number" step="1" placeholder="F.eks. 7" />
+        <button id="kontroller" type="button">Sjekk tall</button>
+      </div>
+      <p id="resultat" class="resultat" aria-live="polite"></p>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
